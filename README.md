@@ -8,92 +8,24 @@
 ---
 
 ## Demo Video
-- 
+- https://www.youtube.com/watch?v=_6O_Qa7-BXs
 
 ---
 
-## GitHub Repositories
-- Order Service (Node.js): https://github.com/Ilyzazai/order-service
-- Product Service (Python FastAPI): https://github.com/Ilyzazai/product-service
-- Store Front (Vue): https://github.com/Ilyzazai/store-front
+## Reflection Questions
+### 1. What are the main differences between a Docker image and a Docker container?
+A Docker image is a read-only template that contains everything needed to run an application, such as the code, dependencies, libraries, and configuration. A Docker container is the running instance of that image. In simple words, the image is like the blueprint, while the container is the live, working version created from that blueprint. The image stays unchanged, but the container can run, stop, and create temporary changes while it is executing.
 
----
+### 2. Explain how Docker's layered architecture improves efficiency.
+Docker uses layers to build images, where each Dockerfile instruction creates a separate layer. This improves efficiency because Docker can reuse unchanged layers instead of rebuilding the whole image every time. It saves storage space, speeds up the build process, and also makes image sharing faster because only the missing or changed layers need to be downloaded. This is very useful when updating an application because small code changes do not require rebuilding everything from the beginning.
 
-## Live Azure URLs
-### Order Service (Azure App Service)
-- https://ilyas-order-service-d9fmb3eefrbfdydt.eastus-01.azurewebsites.net
+### 3. Why does each container get its own writable layer?
+Each container gets its own writable layer so it can make runtime changes without modifying the original image or affecting other containers. This gives isolation between containers, even if they are created from the same image. For example, if one container creates or changes a file, that change stays only inside that container’s writable layer. The other containers continue using the original read-only image layers, which keeps the application more consistent and reliable.
 
-### Product Service (Azure App Service)
-- https://ilyaswebsite-hggsc8ejfeafdndr.eastus-01.azurewebsites.net
+### 4. What are the benefits of using Docker Compose over running containers individually?
+Docker Compose makes it easier to manage multi-container applications by defining everything in one `docker-compose.yml` file. Instead of writing many separate `docker run` commands, we can start all services, networks, and volumes together with one command such as `docker compose up -d`. This makes the setup more organized, repeatable, and easier to maintain. It is especially useful for applications that need more than one service, such as a web application connected to Redis or a database.
 
-### Store Front (Azure Static Web Apps)
-- https://delightful-rock-01cad6e1e.1.azurestaticapps.net
+## Notes About Setup Challenges or Lessons Learned
+One important lesson I learned from this lab is that Docker becomes much easier to manage when the commands and structure are understood step by step. I also learned that images, containers, and layers are closely connected, and understanding their roles helps avoid confusion. Another useful point was seeing how Docker Compose simplifies multi-container applications, because managing services in one YAML file is much cleaner than starting each container manually.
 
----
 
-## Architecture Overview
-This lab deploys a simple full-stack microservices application:
-
-- **store-front (Vue)** is deployed to **Azure Static Web Apps**
-- **order-service (Node.js)** is deployed to **Azure App Service**
-  - publishes order messages to RabbitMQ
-- **product-service (Python FastAPI)** is deployed to **Azure App Service**
-  - returns product list via HTTP API
-- **RabbitMQ** runs on an **Azure VM** and is accessed on:
-  - `5672` (AMQP – required for apps)
-  - `15672` (Management UI – optional)
-
----
-
-## Configuration (Environment Variables)
-
-### Order Service (Azure App Service)
-Added in Azure Portal → App Service → **Environment variables** → **Application settings**:
-
-- `RABBITMQ_CONNECTION_STRING=amqp://guest:guest@<RABBITMQ_VM_PUBLIC_IP>:5672/`
-
-### Store Front (Build-time env)
-Configured to call the deployed APIs (either in `.env.production` or GitHub Actions build env):
-
-- `VUE_APP_ORDER_SERVICE_URL=https://ilyas-order-service-d9fmb3eefrbfdydt.eastus-01.azurewebsites.net`
-- `VUE_APP_PRODUCT_SERVICE_URL=https://ilyaswebsite-hggsc8ejfeafdndr.eastus-01.azurewebsites.net`
-
----
-
-## API Endpoints Used
-
-### Product Service
-- `GET /products`
-  - returns a JSON list of products
-
-### Order Service
-- `POST /orders`
-  - publishes an order message to RabbitMQ (`order_queue`)
-
----
-
-## How to Run / Test (End-to-End)
-1. Start the RabbitMQ VM in Azure.
-2. Confirm RabbitMQ container is running:
-   - `sudo docker ps`
-3. Confirm VM NSG inbound rules allow:
-   - TCP `5672` (required)
-   - TCP `15672` (optional dashboard)
-4. Ensure `RABBITMQ_CONNECTION_STRING` is set in the **order-service** App Service.
-5. Open the Store Front URL and confirm:
-   - Products load successfully from product-service
-   - Placing an order calls order-service successfully
-6. (Optional) Open RabbitMQ UI:
-   - `http://<RABBITMQ_VM_PUBLIC_IP>:15672` (guest/guest)
-   - verify queue/messages activity
-
----
-
-## Notes / Reflection
-- The main deployment steps were:
-  - Deploy both APIs on Azure App Service
-  - Deploy UI on Azure Static Web Apps
-  - Use environment variables to connect services
-  - Verify messaging integration through RabbitMQ
-    
-*AI is used for product services-service code and .md documentation*
