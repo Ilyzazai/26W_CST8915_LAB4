@@ -14,10 +14,10 @@
 
 ## Reflection Questions
 ### 1. What are the main differences between a Docker image and a Docker container?
-A Docker image is a read-only template that contains everything needed to run an application, such as the code, dependencies, libraries, and configuration. A Docker container is the running instance of that image. In simple words, the image is like the blueprint, while the container is the live, working version created from that blueprint. The image stays unchanged, but the container can run, stop, and create temporary changes while it is executing.
+A Docker image is a read-only template that contains everything needed to run an application likr the code, dependencies, libraries, and configuration. A Docker container is the running instance of the image. The image stays unchanged, but the container can run, stop, and create temporary changes while it is executing.
 
 ### 2. Explain how Docker's layered architecture improves efficiency.
-Docker uses layers to build images, where each Dockerfile instruction creates a separate layer. This improves efficiency because Docker can reuse unchanged layers instead of rebuilding the whole image every time. It saves storage space, speeds up the build process, and also makes image sharing faster because only the missing or changed layers need to be downloaded. This is very useful when updating an application because small code changes do not require rebuilding everything from the beginning.
+Docker uses layers to build images where each Dockerfile instruction creates a separate layer. This improves efficiency because Docker can reuse unchanged layers instead of rebuilding the whole image every time. It saves storage space, speeds up the build process, and also makes image sharing faster because only the missing or changed layers need to be downloaded. This is very useful when updating an application because small code changes do not require rebuilding everything from the beginning.
 
 ### 3. Why does each container get its own writable layer?
 Each container gets its own writable layer so it can make runtime changes without modifying the original image or affecting other containers. This gives isolation between containers, even if they are created from the same image. For example, if one container creates or changes a file, that change stays only inside that container’s writable layer. The other containers continue using the original read-only image layers, which keeps the application more consistent and reliable.
